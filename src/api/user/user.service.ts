@@ -33,10 +33,14 @@ export class UserService {
       }
 
       async fetchUserFromToken(req: Request) {
-        const { token } = req['token']
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-        return this.findUserByEmail(decodedToken['userEmail']);
+        try {
+          const { token } = req['token'];
+          const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+          return this.findUserByEmail(decodedToken['userEmail']);
+        } catch (error) {
+          throw new HttpException('Invalid token', 401);
+        }
+        
       }
-
 
 }

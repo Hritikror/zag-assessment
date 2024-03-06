@@ -31,7 +31,7 @@ export class ListingService {
     async updateListingById(id: string, updateListingDto: UpdateListingDto, user: Users) {
         const listing = await this.listingRepository.findOne(id);
         //listing owner only update its listing only 
-        if(listing && (listing.owner === user || listing.owner.role === Constants.ADMIN)) {  //only 'listing owner' and 'admin' can update 
+        if(listing && (listing.owner.email === user.email || user.role === Constants.ADMIN)) {  //only 'listing owner' and 'admin' can update 
             Object.assign(listing, updateListingDto);
             return await this.listingRepository.save(listing);
         } 

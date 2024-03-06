@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Param, Post, Put, Req, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { RolesGuard } from 'src/guards/role.guard';
 import { ReviewService } from './review.service';
 import { UserService } from '../user/user.service';
 import { Roles } from 'src/guards/roles.decorator';
-import { Request } from 'express';
+import { Request, response } from 'express';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 
@@ -28,12 +28,23 @@ export class ReviewController {
 
   @Put('/update/:id')
   async updateReview(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto, @Req() req: Request) {
-   
+    const loggedInUser = await this.userService.fetchUserFromToken(req);
+    switch(loggedInUser.role) {
+      case "ADMIN":
+        return await this.reviewService.updateReviewAsAdmin(id, updateReviewDto, loggedInUser);
+      case "OWNER":
+        return await this.reviewService.updateReviewAsOwner(id, updateReviewDto, loggedInUser);
+      case "CUSTOMER":
+        return await this.reviewService.updateReviewAsCustomer(id, updateReviewDto, loggedInUser);
+      default:
+        throw new HttpException("Role error encountered",401);   //well it never happen
+    }
   }
 
   @Delete('/delete/:id')
   @Roles('ADMIN', 'CUSTOMER')
-  async deleteReview(@Param('id') id: string) {
-  
+  async deleteReview(@Param('id') id: string, @Req() req: Request) {
+    const loggedInUser = await this.userService.fetchUserFromToken(req);
+    return this.reviewService.deleteReview(id, loggedInUser);
   }
 }
