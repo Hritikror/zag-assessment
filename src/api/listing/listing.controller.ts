@@ -6,8 +6,9 @@ import { RolesGuard } from 'src/guards/role.guard';
 import { Roles } from 'src/guards/roles.decorator';
 import { UserService } from '../user/user.service';
 import { UpdateListingDto } from './dto/update-listing.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('listing') // API Documentation
 @Controller('listing')
 @UseGuards(RolesGuard)
 @UsePipes(new ValidationPipe({ transform: true }))

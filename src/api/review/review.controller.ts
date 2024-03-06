@@ -6,8 +6,9 @@ import { Roles } from 'src/guards/roles.decorator';
 import { Request, response } from 'express';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-
+@ApiTags('review')
 @Controller('review')
 @UseGuards(RolesGuard)
 @UsePipes(new ValidationPipe({ transform: true }))
